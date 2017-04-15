@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">"lezhin"</string>
+    <string name="menu_search">"Search"</string>
+    <string name="image_search_err_msg">"이미지 검색 중 오류가 발생하였습니다."</string>
+</resources>

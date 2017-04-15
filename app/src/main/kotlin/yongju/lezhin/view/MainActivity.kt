@@ -86,6 +86,10 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
 
         keywordDisposable = RxSearchView.queryTextChangeEvents(searchView)
+                .doOnNext { if (it.isSubmitted) {
+                    menuItem?.collapseActionView()
+                    changeActionBarTitle(it.queryText().toString())
+                }}
                 .filter { !TextUtils.isEmpty(it.queryText().toString()) }
                 .debounce(SEARCH_DELAY, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -117,8 +121,12 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
         Log.d(TAG, "[closeSearchView]")
         menuItem.let {
             it?.collapseActionView()
-            supportActionBar?.title = keyword
+            changeActionBarTitle(keyword)
         }
+    }
+
+    private fun changeActionBarTitle(title: String) {
+        supportActionBar?.title = title
     }
 
     private fun openSearchView() {

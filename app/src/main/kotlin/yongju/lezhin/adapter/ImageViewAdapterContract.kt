@@ -9,6 +9,7 @@ import yongju.lezhin.data.ImageInfo
 interface ImageViewAdapterContract {
     interface View {
         fun reload()
+        fun clearImage()
     }
 
     interface Model {

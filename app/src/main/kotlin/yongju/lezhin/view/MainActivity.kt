@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
-import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -21,10 +20,13 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
 import yongju.lezhin.R
 import yongju.lezhin.adapter.ImageAdapter
-import yongju.lezhin.data.model.ImageSource
+import yongju.lezhin.adapter.ImageViewAdapterContract
+import yongju.lezhin.component.DaggerImageComponent
+import yongju.lezhin.data.module.DataModule
+import yongju.lezhin.network.module.HostModule
 import yongju.lezhin.presenter.ImageSearchContract
-import yongju.lezhin.presenter.ImageSearchPresenter
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), ImageSearchContract.View {
     companion object {
@@ -34,13 +36,11 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
 
     private var menuItem: MenuItem? = null
 
-    private val imageSearchPresenter by lazy {
-        ImageSearchPresenter()
-    }
+    @Inject
+    lateinit var imageSearchContractPresenter: ImageSearchContract.Presenter
 
-    private val imageAdapter by lazy {
-        ImageAdapter(this, imageSearchPresenter)
-    }
+    @Inject
+    lateinit var imageViewAdapterContractView: ImageViewAdapterContract.View
 
     private var keywordDisposable: Disposable? = null
 
@@ -51,11 +51,11 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
 
         setContentView(R.layout.activity_main)
 
-        imageSearchPresenter.view = this
-        imageSearchPresenter.imageSource = ImageSource
-
-        imageSearchPresenter.imageAdapterModel = imageAdapter
-        imageSearchPresenter.imageAdapterView = imageAdapter
+        val imageAdapter = ImageAdapter(this)
+        DaggerImageComponent.builder()
+                .dataModule(DataModule(this, imageAdapter, imageAdapter))
+                .hostModule(HostModule())
+                .build().inject(this)
 
         main_recyclverview.adapter = imageAdapter
 
@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
         main_recyclverview.layoutManager = linearLayoutManager
         main_recyclverview.itemAnimator = DefaultItemAnimator()
         main_recyclverview.addOnScrollListener(
-                object : InfiniteScollListener(linearLayoutManager, imageSearchPresenter) {
+                object : InfiniteScollListener(linearLayoutManager) {
             override fun onLoadMoreImages() {
-                imageSearchPresenter.searchMoreImage()
+                imageSearchContractPresenter.searchMoreImage()
             }
         })
     }
@@ -88,9 +88,12 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
         keywordDisposable = RxSearchView.queryTextChangeEvents(searchView)
                 .doOnNext { if (it.isSubmitted) {
                     menuItem?.collapseActionView()
-                    changeActionBarTitle(it.queryText().toString())
+                    val queryText = it.queryText()
+                    if (queryText.isNotEmpty()) {
+                        changeActionBarTitle(queryText.toString())
+                    }
                 }}
-                .filter { !TextUtils.isEmpty(it.queryText().toString()) }
+                .filter { it.queryText().isNotEmpty() }
                 .debounce(SEARCH_DELAY, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(keywordConsumer, keywordErrorConsumer)
@@ -104,9 +107,9 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
             Log.d(TAG, "[keywordConsumer] keyword: $keyword")
             hideKeyboard(it.view())
             closeSearchView(keyword)
-            imageAdapter.clearImage()
+            imageViewAdapterContractView.clearImage()
 
-            imageSearchPresenter.searchImage(keyword)
+            imageSearchContractPresenter.searchImage(keyword)
         }
     }
 

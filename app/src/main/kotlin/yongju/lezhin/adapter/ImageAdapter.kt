@@ -5,13 +5,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import yongju.lezhin.adapter.holder.ImageViewHolder
 import yongju.lezhin.data.ImageInfo
-import yongju.lezhin.view.ImageLoadInterface
 
 /**
  * Created by yongju on 2017. 4. 6..
  */
-class ImageAdapter(private val context: Context, private val imageLoadingCalbacks: ImageLoadInterface.ImageLoadingCalbacks)
-    : RecyclerView.Adapter<ImageViewHolder>(), ImageViewAdapterContract.View, ImageViewAdapterContract.Model {
+class ImageAdapter(private val context: Context)
+    : RecyclerView.Adapter<ImageViewHolder>(),
+        ImageViewAdapterContract.View, ImageViewAdapterContract.Model {
 
     val imageUrlList: MutableList<ImageInfo> = ArrayList()
 
@@ -20,7 +20,7 @@ class ImageAdapter(private val context: Context, private val imageLoadingCalback
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder?, position: Int) {
-        holder?.bindView(getItem(position), imageLoadingCalbacks)
+        holder?.bindView(getItem(position))
     }
 
     override fun getItemCount() = imageUrlList.size
@@ -35,8 +35,7 @@ class ImageAdapter(private val context: Context, private val imageLoadingCalback
         imageUrlList.add(imageInfo)
     }
 
-    fun clearImage() {
-//        notifyItemRangeRemoved(0, itemCount)
+    override fun clearImage() {
         imageUrlList.clear()
         reload()
     }

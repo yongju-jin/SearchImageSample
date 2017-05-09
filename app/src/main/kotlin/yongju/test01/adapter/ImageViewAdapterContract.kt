@@ -1,6 +1,6 @@
-package yongju.lezhin.adapter
+package yongju.test01.adapter
 
-import yongju.lezhin.data.ImageInfo
+import yongju.test01.data.ImageInfo
 
 
 /**
@@ -9,6 +9,7 @@ import yongju.lezhin.data.ImageInfo
 interface ImageViewAdapterContract {
     interface View {
         fun reload()
+        fun clearImage()
     }
 
     interface Model {

@@ -19,9 +19,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
+import yongju.test01.adapter.ImageViewAdapterContract
 import yongju.test01.R
 import yongju.test01.adapter.ImageAdapter
-import yongju.test01.adapter.ImageViewAdapterContract
 import yongju.test01.component.DaggerImageComponent
 import yongju.test01.data.module.DataModule
 import yongju.test01.network.module.HostModule

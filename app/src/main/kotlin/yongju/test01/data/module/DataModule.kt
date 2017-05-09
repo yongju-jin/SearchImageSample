@@ -1,10 +1,10 @@
-package yongju.lezhin.data.module
+package yongju.test01.data.module
 
 import dagger.Module
 import dagger.Provides
-import yongju.lezhin.adapter.ImageViewAdapterContract
-import yongju.lezhin.presenter.ImageSearchContract
-import yongju.lezhin.presenter.ImageSearchPresenter
+import yongju.test01.adapter.ImageViewAdapterContract
+import yongju.test01.presenter.ImageSearchContract
+import yongju.test01.presenter.ImageSearchPresenter
 
 /**
  * Created by yongju on 2017. 4. 18..
@@ -24,6 +24,6 @@ class DataModule(val view: ImageSearchContract.View,
     fun providesImageViewAdapterContractView() = imageAdapterView
 
     @Provides
-    fun providesImageSearchPresenter(imageSearchPresenter: ImageSearchPresenter): ImageSearchContract.Presenter =
+    fun providesImageSearchContractPresenter(imageSearchPresenter: ImageSearchPresenter): ImageSearchContract.Presenter =
             imageSearchPresenter
 }

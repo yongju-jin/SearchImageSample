@@ -1,6 +1,6 @@
-package yongju.lezhin.data.model
+package yongju.test01.data.model
 
-import yongju.lezhin.network.ImageServiceInterface
+import yongju.test01.network.ImageServiceInterface
 import javax.inject.Inject
 import javax.inject.Singleton
 

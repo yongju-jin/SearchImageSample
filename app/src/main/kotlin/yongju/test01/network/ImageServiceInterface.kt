@@ -1,10 +1,10 @@
-package yongju.lezhin.network
+package yongju.test01.network
 
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
-import yongju.lezhin.BuildConfig
-import yongju.lezhin.data.ImageResponse
+import yongju.test01.BuildConfig
+import yongju.test01.data.ImageResponse
 
 /**
  * Created by yongju on 2017. 4. 6..

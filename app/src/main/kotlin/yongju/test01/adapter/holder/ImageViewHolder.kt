@@ -1,4 +1,4 @@
-package yongju.lezhin.adapter.holder
+package yongju.test01.adapter.holder
 
 import android.content.Context
 import android.graphics.drawable.Animatable
@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import kotlinx.android.synthetic.main.image_view.view.*
-import yongju.lezhin.R
-import yongju.lezhin.data.ImageInfo
+import yongju.test01.R
+import yongju.test01.data.ImageInfo
 
 /**
  * Created by yongju on 2017. 4. 6..

@@ -1,17 +1,18 @@
-package yongju.lezhin.presenter
+package yongju.test01.presenter
 
 import android.util.Log
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import yongju.lezhin.adapter.ImageViewAdapterContract
-import yongju.lezhin.data.ImageInfo
-import yongju.lezhin.data.model.ImageSource
+import yongju.test01.adapter.ImageViewAdapterContract
+import yongju.test01.data.ImageInfo
+import yongju.test01.data.model.ImageSource
 import javax.inject.Inject
 
 /**
  * Created by yongju on 2017. 4. 5..
  */
+
 class ImageSearchPresenter @Inject constructor(var view: ImageSearchContract.View,
                                                var imageSource: ImageSource,
                                                var imageAdapterModel: ImageViewAdapterContract.Model,
@@ -46,19 +47,21 @@ class ImageSearchPresenter @Inject constructor(var view: ImageSearchContract.Vie
 
     private fun searchImage(keyword: String, page: Int) {
         imageSearchDisposable = imageSource.searchImage(keyword, page)
+                // network 통신 thread
                 .subscribeOn(Schedulers.io())
+                // data setting & view 갱신 thread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     it.channel.item.forEach {
                         imageAdapterModel.addItem(ImageInfo(it.image, it.width.toFloat(),
                                 it.height.toFloat()))
                     }
-                    imageAdapterView.reload()
                 }, {
                     Log.e(TAG, "[ImageLoadErrorConsumer] it: $it", it)
                     view.onFailSearchImage()
                 }, {
                     Log.d(TAG, "[ImageLoadErrorConsumer] complete")
+                    imageAdapterView.reload()
                     disposeImageSearchDisposable()
                 })
     }

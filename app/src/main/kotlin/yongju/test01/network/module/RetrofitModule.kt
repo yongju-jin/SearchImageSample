@@ -1,6 +1,5 @@
-package yongju.lezhin.network.module
+package yongju.test01.network.module
 
-import android.util.Log
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -8,7 +7,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import yongju.lezhin.network.ImageServiceInterface
+import yongju.test01.network.ImageServiceInterface
 import javax.inject.Singleton
 
 /**
@@ -25,7 +24,6 @@ class RetrofitModule {
 
     @Provides @Singleton
     fun provideImageServiceInterface(baseUrl: String): ImageServiceInterface {
-        Log.d(TAG, "[provideImageServiceInterface] baseUrl: $baseUrl")
         return Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -36,7 +34,6 @@ class RetrofitModule {
     }
 
     private fun createOkHttpClient(): OkHttpClient {
-        Log.d(TAG, "[createOkHttpClient]")
         return OkHttpClient.Builder()
                 .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .build()

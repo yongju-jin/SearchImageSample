@@ -1,10 +1,10 @@
-package yongju.lezhin.adapter
+package yongju.test01.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import yongju.lezhin.adapter.holder.ImageViewHolder
-import yongju.lezhin.data.ImageInfo
+import yongju.test01.adapter.holder.ImageViewHolder
+import yongju.test01.data.ImageInfo
 
 /**
  * Created by yongju on 2017. 4. 6..

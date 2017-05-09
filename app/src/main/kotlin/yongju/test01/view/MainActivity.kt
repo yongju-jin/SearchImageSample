@@ -1,4 +1,4 @@
-package yongju.lezhin.view
+package yongju.test01.view
 
 
 import android.os.Bundle
@@ -12,19 +12,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import com.jakewharton.rxbinding2.support.v7.widget.SearchViewQueryTextEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
-import yongju.lezhin.R
-import yongju.lezhin.adapter.ImageAdapter
-import yongju.lezhin.adapter.ImageViewAdapterContract
-import yongju.lezhin.component.DaggerImageComponent
-import yongju.lezhin.data.module.DataModule
-import yongju.lezhin.network.module.HostModule
-import yongju.lezhin.presenter.ImageSearchContract
+import yongju.test01.R
+import yongju.test01.adapter.ImageAdapter
+import yongju.test01.adapter.ImageViewAdapterContract
+import yongju.test01.component.DaggerImageComponent
+import yongju.test01.data.module.DataModule
+import yongju.test01.network.module.HostModule
+import yongju.test01.presenter.ImageSearchContract
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
     companion object {
         private val TAG = "MainActivity"
         private val SEARCH_DELAY = 1L
+        private val VISIBLE_THRESHOLD = 5
     }
 
     private var menuItem: MenuItem? = null
@@ -62,12 +64,18 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
         val linearLayoutManager = LinearLayoutManager(this)
         main_recyclverview.layoutManager = linearLayoutManager
         main_recyclverview.itemAnimator = DefaultItemAnimator()
-        main_recyclverview.addOnScrollListener(
-                object : InfiniteScollListener(linearLayoutManager) {
-            override fun onLoadMoreImages() {
-                imageSearchContractPresenter.searchMoreImage()
-            }
-        })
+
+        RxRecyclerView.scrollEvents(main_recyclverview)
+            .filter {
+                it.dy() > 0
+            }.map {
+                it.view().layoutManager as LinearLayoutManager
+            }.subscribe({
+                if ((it.itemCount
+                        - it.findFirstVisibleItemPosition()) <= VISIBLE_THRESHOLD) {
+                    imageSearchContractPresenter.searchMoreImage()
+                }
+            }, Throwable::printStackTrace)
     }
 
     override fun onDestroy() {
@@ -86,13 +94,15 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
 
         keywordDisposable = RxSearchView.queryTextChangeEvents(searchView)
-                .doOnNext { if (it.isSubmitted) {
-                    menuItem?.collapseActionView()
-                    val queryText = it.queryText()
-                    if (queryText.isNotEmpty()) {
-                        changeActionBarTitle(queryText.toString())
+                .doOnNext {
+                    if (it.isSubmitted) {
+                        menuItem?.collapseActionView()
+                        val queryText = it.queryText()
+                        if (queryText.isNotEmpty()) {
+                            changeActionBarTitle(queryText.toString())
+                        }
                     }
-                }}
+                }
                 .filter { it.queryText().isNotEmpty() }
                 .debounce(SEARCH_DELAY, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -122,8 +132,8 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
 
     private fun closeSearchView(keyword: String) {
         Log.d(TAG, "[closeSearchView]")
-        menuItem.let {
-            it?.collapseActionView()
+        menuItem?.let {
+            it.collapseActionView()
             changeActionBarTitle(keyword)
         }
     }
@@ -134,9 +144,7 @@ class MainActivity : AppCompatActivity(), ImageSearchContract.View {
 
     private fun openSearchView() {
         Log.d(TAG, "[openSearchView]")
-        menuItem.let {
-            it?.expandActionView()
-        }
+        menuItem?.expandActionView()
     }
 
     private fun hideKeyboard(view: SearchView) {
